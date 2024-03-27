@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shop/models/order.dart';
-import 'package:shop/models/product.dart';
 
 class OrderWidget extends StatefulWidget {
   final Order order;
@@ -24,7 +23,7 @@ class _OrderWidgetState extends State<OrderWidget> {
             subtitle:
                 Text(DateFormat('dd/MM/yyyy hh:mm').format(widget.order.date)),
             trailing: IconButton(
-              icon: Icon(Icons.expand_more),
+              icon: const Icon(Icons.expand_more),
               onPressed: () {
                 setState(() {
                   _expanded = !_expanded;
