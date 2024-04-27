@@ -1,4 +1,5 @@
-import 'dart:math';
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,12 +19,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
   final _imageUrlFocus = FocusNode();
   final _imageUrlController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final _formData = Map<String, Object>();
+  final _formData = <String, Object>{};
   bool _isLoading = false;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _imageUrlController.addListener(updateImage);
   }
@@ -49,7 +49,6 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _priceFocus.dispose();
     _descriptionFocus.dispose();
@@ -69,7 +68,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     return isValidUrl && endsWithFile;
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     final isValid = _formKey.currentState?.validate() ?? false;
 
     if (!isValid) {
@@ -80,12 +79,31 @@ class _ProductFormPageState extends State<ProductFormPage> {
 
     setState(() => _isLoading = true);
 
-    Provider.of<ProductList>(context, listen: false)
-        .saveProduct(_formData)
-        .then((value) {
+    try {
+      await Provider.of<ProductList>(context, listen: false)
+          .saveProduct(_formData);
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (error) {
+      if (context.mounted) {
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Ocorreu um erro!'),
+            content: const Text('Ocorreu um erro ao salvar o produto!'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Fechar'),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
       setState(() => _isLoading = false);
-      Navigator.of(context).pop();
-    });
+    }
   }
 
   @override
