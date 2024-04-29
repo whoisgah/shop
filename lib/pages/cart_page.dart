@@ -99,7 +99,12 @@ class _CartButtonState extends State<CartButton> {
                     widget.cart.clear();
                     setState(() => _isLoading = false);
                   },
-            child: const Text('COMPRAR'),
+            child: Text(
+              'Comprar',
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
           );
   }
 }
