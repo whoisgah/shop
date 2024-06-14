@@ -12,6 +12,7 @@ import 'package:shop/pages/product_form_page.dart';
 import 'package:shop/pages/product_page.dart';
 import 'package:shop/utils/app_routes.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop/utils/custom_route.dart';
 
 void main() async {
   await dotenv.load();
@@ -31,13 +32,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, ProductList>(
           create: (_) => ProductList(),
           update: (BuildContext context, auth, ProductList? previous) {
-            return ProductList(auth.token ?? '', previous?.items ?? [], auth.userId ?? '');
+            return ProductList(
+                auth.token ?? '', previous?.items ?? [], auth.userId ?? '');
           },
         ),
         ChangeNotifierProxyProvider<Auth, OrderList>(
           create: (_) => OrderList(),
           update: (BuildContext context, auth, OrderList? previous) {
-            return OrderList(auth.token ?? '', previous?.items ?? [], auth.userId ?? '');
+            return OrderList(
+                auth.token ?? '', previous?.items ?? [], auth.userId ?? '');
           },
         ),
         ChangeNotifierProvider(
@@ -75,6 +78,10 @@ class MyApp extends StatelessWidget {
             ),
           ),
           fontFamily: 'Lato',
+          pageTransitionsTheme: PageTransitionsTheme(builders: {
+            TargetPlatform.android: CustomPageTransitionsBuilder(),
+            TargetPlatform.iOS: CustomPageTransitionsBuilder(),
+          }),
         ),
         debugShowCheckedModeBanner: false,
         routes: {
