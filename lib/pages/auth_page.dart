@@ -22,43 +22,47 @@ class AuthPage extends StatelessWidget {
               end: Alignment.bottomRight,
             )),
           ),
-          Container(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 70,
-                  ),
-                  // cascade operator
-                  transform: Matrix4.rotationZ(-8 * pi / 180)..translate(-10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+          Center(
+            child: SingleChildScrollView(
+              child: Container(
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 70,
                       ),
-                    ],
-                  ),
-                  child: const Text(
-                    'Minha Loja',
-                    style: TextStyle(
-                      fontSize: 45,
-                      fontFamily: 'Anton',
-                      color: Colors.white,
+                      // cascade operator
+                      transform: Matrix4.rotationZ(-8 * pi / 180)..translate(-10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.5),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Text(
+                        'Minha Loja',
+                        style: TextStyle(
+                          fontSize: 45,
+                          fontFamily: 'Anton',
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    const AuthForm()
+                  ],
                 ),
-                const SizedBox(height: 20),
-                const AuthForm()
-              ],
+              ),
             ),
           )
         ],

@@ -12,18 +12,76 @@ class AuthForm extends StatefulWidget {
   State<AuthForm> createState() => _AuthFormState();
 }
 
-class _AuthFormState extends State<AuthForm> {
-  AuthMode _authMode = AuthMode.login;
+class _AuthFormState extends State<AuthForm>
+    with SingleTickerProviderStateMixin {
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  Map<String, String> _authData = {
+  AuthMode _authMode = AuthMode.login;
+  final Map<String, String> _authData = {
     'email': '',
     'password': '',
   };
 
+  AnimationController? _controller;
+  Animation<double>? _opacityAnimation;
+  Animation<Offset>? _slideAnimation;
+
   bool _isLogin() => _authMode == AuthMode.login;
-  bool _isSignup() => _authMode == AuthMode.signup;
+  // bool _isSignup() => _authMode == AuthMode.signup;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 300,
+      ),
+    );
+
+    _opacityAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller!,
+        curve: Curves.linear,
+      ),
+    );
+
+        _slideAnimation = Tween(
+      begin: const Offset(0, -1.5),
+      end: const Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller!,
+        curve: Curves.linear,
+      ),
+    );
+
+
+    // _heightAnimation?.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller?.dispose();
+  }
+
+  void _switchAuthMode() {
+    setState(() {
+      if (_isLogin()) {
+        _authMode = AuthMode.signup;
+        _controller?.forward();
+      } else {
+        _authMode = AuthMode.login;
+        _controller?.reverse();
+      }
+    });
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -68,7 +126,7 @@ class _AuthFormState extends State<AuthForm> {
       }
     } on AuthException catch (error) {
       _showErrorDialog(error.toString());
-    } catch(error) {
+    } catch (error) {
       _showErrorDialog('Ocorreu um erro inesperado!');
     }
 
@@ -83,8 +141,11 @@ class _AuthFormState extends State<AuthForm> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
         height: _isLogin() ? 324 : 414,
+        // height: _heightAnimation?.value.height ?? (_isLogin() ? 310 : 400),
         padding: const EdgeInsets.all(16),
         width: deviceSize.width * 0.75,
         child: Form(
@@ -119,22 +180,35 @@ class _AuthFormState extends State<AuthForm> {
                   return null;
                 },
               ),
-              if (_isSignup())
-                TextFormField(
-                  decoration:
-                      const InputDecoration(labelText: 'Confirmar senha'),
-                  keyboardType: TextInputType.emailAddress,
-                  obscureText: true,
-                  validator: _isLogin()
-                      ? null
-                      : ((_password) {
-                          final password = _password ?? '';
-                          if (password != _passwordController.text) {
-                            return 'Senhas são diferentes';
-                          }
-                          return null;
-                        }),
+              AnimatedContainer(
+                constraints: BoxConstraints(
+                  minHeight: _isLogin() ? 0 : 60,
+                  maxHeight: _isLogin() ? 0 : 120,
                 ),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.linear,
+                child: FadeTransition(
+                  opacity: _opacityAnimation!,
+                  child: SlideTransition(
+                    position: _slideAnimation!,
+                    child: TextFormField(
+                      decoration:
+                          const InputDecoration(labelText: 'Confirmar senha'),
+                      keyboardType: TextInputType.emailAddress,
+                      obscureText: true,
+                      validator: _isLogin()
+                          ? null
+                          : ((_password) {
+                              final password = _password ?? '';
+                              if (password != _passwordController.text) {
+                                return 'Senhas são diferentes';
+                              }
+                              return null;
+                            }),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -158,13 +232,9 @@ class _AuthFormState extends State<AuthForm> {
                 ),
               const Spacer(),
               TextButton(
-                onPressed: () {
-                  setState(() {
-                    _authMode = _isLogin() ? AuthMode.signup : AuthMode.login;
-                  });
-                },
+                onPressed: _switchAuthMode,
                 child: Text(
-                  _isLogin() ? 'Criar uma nova conta?' : 'Já possui uma conta?',
+                  _isLogin() ? 'Criar uma nova conta' : 'Já possui uma conta?',
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                   ),
